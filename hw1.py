@@ -1,4 +1,5 @@
 import sys
+from collections import deque
 
 # Write a program to solve the following search problem: You are given two
 #  words of equal length and a dictionary of legal English words. At each step,
@@ -54,7 +55,8 @@ def BFS(list, matrix, start, target):
     # keep track of every word that we check so we dont double check, 
     # and get the index of the start word
     index = list.index(start)
-    checked = [index]
+    checked = set()
+    checked.add(index)
 
     # so i think i need a 2d matrix in order to keep track of each path. 
     # every time there is a new path, add a new row to the matrix
@@ -62,18 +64,15 @@ def BFS(list, matrix, start, target):
     # pathTracker = [[0 for i in range(100)] for j in range(20)]
     #print(pathTracker)
 
-    # timeout threshhold
-    timeout = 0
-
     # a queue of indexs to be checked starting with our start word
-    queue = [index]
+    queue = deque([index])
 
     # keep a list and add every word checked along with that words parent
     # this way we can retrace at the end
     parentList = [(index, None)]
 
     # While our queue is not empty
-    while len(queue) > 0 and timeout < 400:
+    while len(queue) > 0:
         # use count to keep track of the current potential neighbor index
         count = 0
         # for every other word accociated
@@ -94,11 +93,12 @@ def BFS(list, matrix, start, target):
                     
             
         # We checked and added all of index's neighbors so we can add index to checked
-        checked.append(index)
+        checked.add(index)
         # We can remove this from the queue to be checked. This queue structure should insure first in first out BFS
-        queue.pop(0)
+        queue.popleft()
         # Next up
         if len(queue) == 0:
+            print("no solution")
             return
         index = queue[0]
         
