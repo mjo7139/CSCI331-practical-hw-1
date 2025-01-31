@@ -6,15 +6,7 @@ import sys
 # that the result is a word in the dictionary; you cannot add or remove
 #  letters. Your program should print the shortest list of words that connects
 #  the two given words in this way, if there are multiple such paths, any one 
-# is sufficient.
-
-def retrace(parentList, target):
-    # given the final value "target"
-    # go through the list grabbing each parent and adding it to its own list
-    # then print the reverse of that list to get the path we took to get to target
-    list = []
-    while 
-        parent = next((i for i, v in enumerate(l) if v[0] == 53), None)
+# is sufficient.        
 
 def isEdge(str1, str2):
     # function to check if two strings are edges in the problem. I.e they 
@@ -70,26 +62,24 @@ def BFS(list, matrix, start, target):
     # pathTracker = [[0 for i in range(100)] for j in range(20)]
     #print(pathTracker)
 
+    # timeout threshhold
+    timeout = 0
+
     # a queue of indexs to be checked starting with our start word
     queue = [index]
-
-    # This will be a list of the indexs visited. We can use to print the path
-    path = []
-    pathNum = 0
 
     # keep a list and add every word checked along with that words parent
     # this way we can retrace at the end
     parentList = [(index, None)]
-    toPrint = []
 
     # While our queue is not empty
-    while len(queue) > 0:
+    while len(queue) > 0 and timeout < 400:
         # use count to keep track of the current potential neighbor index
         count = 0
         # for every other word accociated
         for potNeighbor in matrix[index]:
             # if the word differs by one letter...
-            if potNeighbor == 1 and (potNeighbor not in checked):
+            if potNeighbor == 1 and (count not in checked):
                 # it is a neighbor and is not in the checked list, add it to the queue
                 queue.append(count)
 
@@ -98,22 +88,45 @@ def BFS(list, matrix, start, target):
 
                 #check if it is the target
                 if list[count] == target:
-                    retrace(parentList, target)
+                    retrace(parentList, count, list)
+                    return
             count += 1
                     
             
         # We checked and added all of index's neighbors so we can add index to checked
         checked.append(index)
-        # Add it to the path
-        path.append(index)
         # We can remove this from the queue to be checked. This queue structure should insure first in first out BFS
         queue.pop(0)
         # Next up
         if len(queue) == 0:
             return
         index = queue[0]
+        
+    print("no solution")
 
 
+def retrace(parentList, targetIndex, list):
+    # given the final value "target"
+    # go through the list grabbing each parent and adding it to its own list
+    # then print the reverse of that list to get the path we took to get to target
+
+    #parentList = list of (indexOfWord, IndexOfParent) on path
+    give = []
+    # sets index to the index at which (target, parentOfTarget) is
+    index = next((i for i, v in enumerate(parentList) if v[0] == targetIndex), None)
+    # sets parentIndex to the index at which parent is in list
+    parentIndex = parentList[index][1]
+    # adds the target as the first of the "give" list
+    give.append(list[targetIndex])
+
+    while parentIndex is not None:
+        index = next((i for i, v in enumerate(parentList) if v[0] == parentIndex), None)
+        give.append(list[parentIndex])
+        parentIndex = parentList[index][1]
+        
+    give.reverse()
+    for i in range(len(give)):
+        print(give[i])
 
 
 def main():
@@ -127,10 +140,7 @@ def main():
     list = initializeList(filename, wordLen)
     # read through the list and create an adjacency matrix for the words
     matrix = createMatrix(list)
-    #print(matrix)
     # given the list and the adjacency matrix lets make our spanning tree
-    # we will make a tuple dictionary 
-    # (index1, index2) = distfrom(index -> index2)
     BFS(list, matrix, start, target)
     
     
