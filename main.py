@@ -8,6 +8,14 @@ import sys
 #  the two given words in this way, if there are multiple such paths, any one 
 # is sufficient.
 
+def retrace(parentList, target):
+    # given the final value "target"
+    # go through the list grabbing each parent and adding it to its own list
+    # then print the reverse of that list to get the path we took to get to target
+    list = []
+    while 
+        parent = next((i for i, v in enumerate(l) if v[0] == 53), None)
+
 def isEdge(str1, str2):
     # function to check if two strings are edges in the problem. I.e they 
     # differ by one letter
@@ -51,36 +59,53 @@ def createMatrix(list):
     return matrix
 
 def BFS(list, matrix, start, target):
-    # keep track of the parent of every word we gotten. This way we can retrace once we find the target
-
-    # keep track of every word that we check so we dont double check, and get the index of the start word
-    checked = []
+    # keep track of every word that we check so we dont double check, 
+    # and get the index of the start word
     index = list.index(start)
+    checked = [index]
+
+    # so i think i need a 2d matrix in order to keep track of each path. 
+    # every time there is a new path, add a new row to the matrix
+    # array [branch # | 20] [step # along the branch | 20]
+    # pathTracker = [[0 for i in range(100)] for j in range(20)]
+    #print(pathTracker)
+
     # a queue of indexs to be checked starting with our start word
     queue = [index]
-    checked.append(index)
-    go = True
-    
-    # for each word, if it is connected...
+
+    # This will be a list of the indexs visited. We can use to print the path
+    path = []
+    pathNum = 0
+
+    # keep a list and add every word checked along with that words parent
+    # this way we can retrace at the end
+    parentList = [(index, None)]
+    toPrint = []
+
+    # While our queue is not empty
     while len(queue) > 0:
         # use count to keep track of the current potential neighbor index
         count = 0
+        # for every other word accociated
         for potNeighbor in matrix[index]:
             # if the word differs by one letter...
-            
             if potNeighbor == 1 and (potNeighbor not in checked):
-                print(count)
                 # it is a neighbor and is not in the checked list, add it to the queue
                 queue.append(count)
-                
+
+                # add this word to the parent list along with its parent
+                parentList.append((count, index))
+
                 #check if it is the target
                 if list[count] == target:
-                    return target
+                    retrace(parentList, target)
             count += 1
                     
             
         # We checked and added all of index's neighbors so we can add index to checked
         checked.append(index)
+        # Add it to the path
+        path.append(index)
         # We can remove this from the queue to be checked. This queue structure should insure first in first out BFS
         queue.pop(0)
         # Next up
@@ -106,8 +131,8 @@ def main():
     # given the list and the adjacency matrix lets make our spanning tree
     # we will make a tuple dictionary 
     # (index1, index2) = distfrom(index -> index2)
-    got = BFS(list, matrix, start, target)
-    print(got)
+    BFS(list, matrix, start, target)
+    
     
 
 if __name__ == '__main__':
